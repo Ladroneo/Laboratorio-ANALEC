@@ -1,0 +1,66 @@
+
+```{r carga de librerías}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r 1}
+#Cargue la base de datos y almacene su contenido en un objeto llamado “datos”
+
+```
+
+```{r 2}
+#Realice una inspección de los datos y proporcione el número de observaciones y variables en el conjunto de datos
+
+```
+
+```{r 3}
+#Transforme la variable “Nro.voto” a numérica.
+
+```
+
+```{r 4}
+#Otorgue nuevos nombres a las siguientes variables
+
+```
+
+```{r 5}
+#Obtenga una lista (única) de las distintas regiones presentes en la base de datos.
+
+```
+
+```{r 6}
+#Elimine las filas que contienen totales de votos nulos o en blanco al final de cada mesa para garantizar una representación precisa de los datos de la elección. Luego, proporcione el número actualizado de observaciones en el conjunto de datos
+
+```
+
+```{r 7}
+#Calcule el número total de votos emitidos en la elección.
+
+```
+
+```{r 8}
+#Calcule y compare el número de votos obtenidos por cada partido en la elección.
+
+```
+
+```{r 9}
+#Identifique el partido con la mayor cantidad de votos y el partido con la menor cantidad de votos en la elección
+
+```
+
+```{r 10}
+#Cree un gráfico que muestre la cantidad de votos entre los partidos en la elección
+
+```
+
+```{r 11}
+#Calcule y compare el número total de votos emitidos por cada región en la elección.
+
+```
+
+```{r 12}
+#Utilizando la base de datos inicial, obten la cantidad de votos nulos o en blanco por región. Calcula y compara el porcentaje de votos nulos o en blaco respecto a los validamente emitidos.
+
+```
+
