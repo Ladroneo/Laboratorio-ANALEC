@@ -1,66 +1,91 @@
 
 ```{r carga de librerías}
 library(tidyverse)
+library(readr)
+library(skimr)
 library(ggplot2)
+library(conflicted)
+conflicts_prefer(dplyr::filter, .quiet = TRUE)
 ```
 
 ```{r 1}
 #Cargue la base de datos y almacene su contenido en un objeto llamado “datos”
-
+datos <- read.delim("C:/Universidad/ANALEC/Laboratorio-ANALEC/2023_05_CCG_Votacion.txt", header = TRUE, sep = "|")
 ```
 
 ```{r 2}
 #Realice una inspección de los datos y proporcione el número de observaciones y variables en el conjunto de datos
-
+skim(datos)
 ```
+De acuerdo con los datos, hay 1.058.415 observaciones en 17 variables.
 
 ```{r 3}
 #Transforme la variable “Nro.voto” a numérica.
-
+datos$Nro.voto <- as.numeric(datos$Nro.voto)
+class(datos$Nro.voto)
 ```
 
 ```{r 4}
 #Otorgue nuevos nombres a las siguientes variables
-
+colnames(datos)[13:17] <-
+  c("Nombres", "Apellido1", "Apellido2", "Cargo", "Votos")
 ```
 
 ```{r 5}
 #Obtenga una lista (única) de las distintas regiones presentes en la base de datos.
-
+unique(datos$Region)
 ```
 
 ```{r 6}
 #Elimine las filas que contienen totales de votos nulos o en blanco al final de cada mesa para garantizar una representación precisa de los datos de la elección. Luego, proporcione el número actualizado de observaciones en el conjunto de datos
-
+datos_vv <- datos %>% 
+  filter(Nombres != "VOTOS NULOS" & Nombres != "VOTOS EN BLANCO") 
+colnames(datos_vv)[13:17] <-
+  c("Nombres", "Apellido1", "Apellido2", "Cargo", "Votos")
+skim(datos_vv)
 ```
+De acuerdo con los datos ya filtrados, hay 981.085 observaciones en 17 variables.
 
 ```{r 7}
 #Calcule el número total de votos emitidos en la elección.
-
+sum(datos$Votos)
+sum(datos_vv$Votos)
 ```
+De acuerdo con los datos, fueron emitidos 12.506.673 votos; de los cuales 9.813.212 fueron votos válidamente emitidos.
 
 ```{r 8}
 #Calcule y compare el número de votos obtenidos por cada partido en la elección.
-
+vxp <- datos_vv %>% 
+  group_by(Partido) %>% 
+  summarise(sum(Votos)) %>% 
+  `colnames<-`(c("Partido", "Votos"))
 ```
 
-```{r 9}
+```{r 9!!}
 #Identifique el partido con la mayor cantidad de votos y el partido con la menor cantidad de votos en la elección
-
+vxpmm <- vxp %>% 
+  filter()
 ```
 
-```{r 10}
+```{r 10!!!}
 #Cree un gráfico que muestre la cantidad de votos entre los partidos en la elección
-
+p <- ggplot(vxp, aes(x=Partidos)) + 
+  geom_histogram()
 ```
 
 ```{r 11}
 #Calcule y compare el número total de votos emitidos por cada región en la elección.
-
+vxr <- datos %>% 
+  group_by(Region) %>% 
+  summarise(sum(Votos)) %>% 
+  `colnames<-`(c("Region", "Votos"))
 ```
 
-```{r 12}
+```{r 12 !!}
 #Utilizando la base de datos inicial, obten la cantidad de votos nulos o en blanco por región. Calcula y compara el porcentaje de votos nulos o en blaco respecto a los validamente emitidos.
+
+vnb <- datos %>% 
+  filter(Nro.voto)
 
 ```
 
