@@ -76,9 +76,6 @@ vxp %>%
 
 ```{r 10 !}
 #Cree un gráfico que muestre la cantidad de votos entre los partidos en la elección
-vxp_i <- vxp %>% 
-  filter(!str_detect(Partido, "Independiente"))
-
 ggplot(vxp, aes(x = Partido,
                 y = Votos)) +
   labs(title = "Gráfico de Barras", 
