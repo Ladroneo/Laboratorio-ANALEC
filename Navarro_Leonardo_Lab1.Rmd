@@ -92,10 +92,14 @@ vxr <- datos %>%
 ```
 
 ```{r 12}
-#Utilizando la base de datos inicial, obten la cantidad de votos nulos o en blancos por región. Calcula y compara el porcentaje de votos nulos o en blanco respecto a los validamente emitidos.
+#Utilizando la base de datos inicial, obten la cantidad de votos nulos o en blancos por región. 
+#Calcula y compara el porcentaje de votos nulos o en blanco respecto a los validamente emitidos.
+##como dice votos nulos *o* blancos no los puedo sumar
 vxr_bn <- datos %>% 
   filter(is.na(Nro.voto)) %>% 
   group_by(Nombres, Region) %>% 
+##group_by() se rompe y reclama al usar dos variables
+##no tengo la menor idea de por que
   summarise(Votos = sum(Votos)) %>% 
   pivot_wider(names_from = Nombres, values_from = Votos) %>%
 ##no me acuerdo si vimos pivot_wider() en la ayudantía
@@ -112,5 +116,6 @@ vxr_bn <- vxr_bn[, c(1,2,5,3,6,4,7)] %>%
                  "Porcentaje de votos nulos",
                  "Votos válidamente emitidos",
                  "Porcentaje de votos válidamente emitidos"))
+#reordenar y renombrar headers
 ```
 
