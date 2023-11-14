@@ -1,5 +1,6 @@
 ```{r librerias y configuraciones}
-library(tidyverse)
+library(magrittr)
+library(dplyr)
 library(readr)
 library(skimr)
 library(ggplot2)
@@ -11,6 +12,7 @@ options(dplyr.summarise.inform = FALSE)
 ```{r 1}
 #Cargue la base de datos y almacene su contenido en un objeto llamado “datos”.
 datos <- read.delim("C:/Universidad/ANALEC/Laboratorio-ANALEC/2023_05_CCG_Votacion.txt", header = TRUE, sep = "|")
+saveRDS(datos, file = "ccg.rds")
 ```
 
 ```{r 2}
@@ -81,7 +83,8 @@ ggplot(vxp, aes(x = Partido,
   labs(title = "Gráfico de Barras", 
        x = "Partido", 
        y = "Votos") + 
-  geom_histogram(stat = "identity", fill = "blue")
+  geom_histogram(stat = "identity", fill = "blue") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
   
 ```{r 11}
