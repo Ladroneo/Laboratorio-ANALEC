@@ -5,7 +5,6 @@ encoding: UTF8
 
 ```{r librerias y configuraciones, echo=TRUE, message=FALSE}
 #noverse
-library(knitr)
 library(readr)
 library(magrittr)
 library(dplyr)
@@ -27,10 +26,10 @@ datos <- read.delim("C:/Universidad/ANALEC/Laboratorio-ANALEC/2023_05_CCG_Votaci
 
 ```{r 2, echo=TRUE}
 #Realice una inspección de los datos y proporcione el número de observaciones y variables en el conjunto de datos.
-skim_without_charts(datos)
+skim(datos)
 ```
 
-De acuerdo con los datos, hay 1.058.415 observaciones en 17 variables.
+De acuerdo con los datos, existen 1.058.415 observaciones -correspondiente con las mesas escrutadas- en 17 variables.
 
 ```{r 3, echo=TRUE}
 #Transforme la variable “Nro.voto” a numérica.
@@ -48,6 +47,7 @@ colnames(datos)[13:17] <-
 #Obtenga una lista (única) de las distintas regiones presentes en la base de datos.
 unique(datos$Region)
 ```
+
 
 ```{r 6, echo=TRUE}
 #Elimine las filas que contienen totales de votos nulos o en blanco al final de cada mesa para garantizar una representación precisa de los datos de la elección. Luego, proporcione el número actualizado de observaciones en el conjunto de datos
@@ -70,8 +70,10 @@ De acuerdo con los datos, fueron emitidos 12.506.673 votos; de los cuales 9.813.
 #Calcule y compare el número de votos obtenidos por cada partido en la elección.
 vxp <- datos_vv %>% 
   group_by(Partido) %>% 
-  summarise(Votos = sum(Votos))
+  summarise(Votos = sum(Votos)) %>% mutate(porcentaje = (Votos/sum(Votos)*100))
 ```
+
+Poco más de un tercio de los votos reclamó el Partido Republicano de Chile, el siguiente tercio fue reclamado por los partidos: Comunista de Chile, Unión Demócrata Independiente, De la Gente, Convergencia Social, Renovación Nacional, y Socialista de Chile. El último tercio de todos los votos válidamente emitidos fueron reclamados por otros 9 partidos políticos y los cupos independientes.
 
 ```{r 9, echo=TRUE}
 #Identifique el partido con la mayor cantidad de votos y el partido con la menor cantidad de votos en la elección
@@ -79,7 +81,7 @@ vxp %>%
   slice(which.max(Votos),
         which.min(Votos))
 ```
-El partido con mayor cantidad de votos válidos corresponde al Partido Republicano de Chile, con 3.476.333. Mientras que el partido con menor cantidad de vótos válidos corresponde a Acción Humanista con 3.073 votos.
+El partido con mayor cantidad de votos válidos corresponde al Partido Republicano de Chile, con 3.476.333 (35,4%). Mientras que el partido con menor cantidad de vótos válidos corresponde a Acción Humanista con 3.073 votos (3,1%).
 
 ```{r 10 !, echo=TRUE, fig.height=6}
 #Cree un gráfico que muestre la cantidad de votos entre los partidos en la elección
