@@ -1,116 +1,126 @@
-```{r librerias y configuraciones}
+---
+output: pdf_document
+encoding: UTF8
+---
+
+```{r librerias y configuraciones, echo=TRUE, message=FALSE}
+#noverse
+library(knitr)
+library(readr)
 library(magrittr)
 library(dplyr)
-library(readr)
+library(tidyr)
 library(skimr)
 library(ggplot2)
+library(scales)
 library(conflicted)
 conflicts_prefer(dplyr::filter, .quiet = TRUE)
+#group_by() en dos variables se rompe sin esta opción:
 options(dplyr.summarise.inform = FALSE)
+options(scipen = 999)
 ```
 
-```{r 1}
+```{r 1, echo=TRUE}
 #Cargue la base de datos y almacene su contenido en un objeto llamado “datos”.
 datos <- read.delim("C:/Universidad/ANALEC/Laboratorio-ANALEC/2023_05_CCG_Votacion.txt", header = TRUE, sep = "|")
-saveRDS(datos, file = "ccg.rds")
 ```
 
-```{r 2}
+```{r 2, echo=TRUE}
 #Realice una inspección de los datos y proporcione el número de observaciones y variables en el conjunto de datos.
-skim(datos)
+skim_without_charts(datos)
 ```
 
 De acuerdo con los datos, hay 1.058.415 observaciones en 17 variables.
 
-```{r 3}
+```{r 3, echo=TRUE}
 #Transforme la variable “Nro.voto” a numérica.
 datos$Nro.voto <- as.numeric(datos$Nro.voto)
-##
 class(datos$Nro.voto)
 ```
 
-```{r 4}
+```{r 4, echo=TRUE}
 #Otorgue nuevos nombres a las siguientes variables
 colnames(datos)[13:17] <-
   c("Nombres", "Apellido1", "Apellido2", "Cargo", "Votos")
 ```
 
-```{r 5}
+```{r 5, echo=TRUE}
 #Obtenga una lista (única) de las distintas regiones presentes en la base de datos.
 unique(datos$Region)
 ```
 
-```{r 6}
+```{r 6, echo=TRUE}
 #Elimine las filas que contienen totales de votos nulos o en blanco al final de cada mesa para garantizar una representación precisa de los datos de la elección. Luego, proporcione el número actualizado de observaciones en el conjunto de datos
 datos_vv <- datos %>% 
   filter(!is.na(Nro.voto))
-##
 colnames(datos_vv)[13:17] <-
   c("Nombres", "Apellido1", "Apellido2", "Cargo", "Votos")
-##
-skim(datos_vv)
+skim_without_charts(datos_vv)
 ```
+Se ejecutó la limpieza inicial de los datos sobre la nueva base de datos; por lo que de acuerdo con los datos actualizados, hay 981.085 observaciones en 17 variables.
 
-De acuerdo con los datos actualizados, hay 981.085 observaciones en 17 variables.
-
-```{r 7}
+```{r 7, echo=TRUE}
 #Calcule el número total de votos emitidos en la elección.
 sum(datos$Votos)
-##
 sum(datos_vv$Votos)
 ```
-
 De acuerdo con los datos, fueron emitidos 12.506.673 votos; de los cuales 9.813.212 fueron votos válidamente emitidos.
 
-```{r 8}
+```{r 8, echo=TRUE}
 #Calcule y compare el número de votos obtenidos por cada partido en la elección.
 vxp <- datos_vv %>% 
   group_by(Partido) %>% 
   summarise(Votos = sum(Votos))
 ```
 
-```{r 9}
+```{r 9, echo=TRUE}
 #Identifique el partido con la mayor cantidad de votos y el partido con la menor cantidad de votos en la elección
 vxp %>% 
   slice(which.max(Votos),
         which.min(Votos))
 ```
+El partido con mayor cantidad de votos válidos corresponde al Partido Republicano de Chile, con 3.476.333. Mientras que el partido con menor cantidad de vótos válidos corresponde a Acción Humanista con 3.073 votos.
 
-```{r 10 !}
+```{r 10 !, echo=TRUE, fig.height=6}
 #Cree un gráfico que muestre la cantidad de votos entre los partidos en la elección
-ggplot(vxp, aes(x = Partido,
-                y = Votos)) +
-  labs(title = "Gráfico de Barras", 
-       x = "Partido", 
-       y = "Votos") + 
-  geom_histogram(stat = "identity", fill = "blue") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(
+#grepl() para sacar a los independientes del análisis:
+  vxp[!grepl("INDEPENDIENTE",vxp$Partido),], 
+  aes(x = Partido, y = Votos)) +
+  labs(title = "Votos por Partidos", x = "Partido", y = "Votos") + 
+  geom_bar(stat = "identity", fill = "blue") +
+  scale_y_continuous(labels = scales::label_number_si()) +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1))
 ```
   
-```{r 11}
+```{r 11, echo=TRUE}
 #Calcule y compare el número total de votos emitidos por cada región en la elección.
 vxr <- datos %>% 
   group_by(Region) %>% 
   summarise(Votos = sum(Votos))
 ```
+La mayoría de las regiones condicen el número de votos totales emitidos con la población vigente. Exceptuando las regiones de: Del Libertador General Bernardo O'Higgins, De la Araucanía, De Antofagasta, y De Ñuble.
 
-```{r 12}
+```{r 12, echo=TRUE}
 #Utilizando la base de datos inicial, obten la cantidad de votos nulos o en blancos por región. 
 #Calcula y compara el porcentaje de votos nulos o en blanco respecto a los validamente emitidos.
-##como dice votos nulos *o* blancos no los puedo sumar
+###
+#como dice votos nulos *o* blancos no los puedo sumar
 vxr_bn <- datos %>% 
   filter(is.na(Nro.voto)) %>% 
   group_by(Nombres, Region) %>% 
-##group_by() se rompe y reclama al usar dos variables
-##no tengo la menor idea de por que
+#group_by() se rompe y reclama al usar dos variables
+#no tengo la menor idea de por que
   summarise(Votos = sum(Votos)) %>% 
   pivot_wider(names_from = Nombres, values_from = Votos) %>%
-##no me acuerdo si vimos pivot_wider() en la ayudantía
+#no me acuerdo si vimos pivot_wider() en la ayudantía
+#cálculo de porcentajes:
   mutate(votos = vxr$Votos,
-         pb = round(`VOTOS EN BLANCO` / votos * 100, digits = 1),
-         pn = round(`VOTOS NULOS` / votos * 100, digits = 1),
-         pv = round(((votos - (`VOTOS NULOS`+`VOTOS EN BLANCO`)) / votos) * 100, digits = 1))
-##
+         pb = round((`VOTOS EN BLANCO` / votos) * 100, digits = 1),
+         pn = round((`VOTOS NULOS` / votos) * 100, digits = 1),
+         pv = round(((votos - (`VOTOS NULOS`+`VOTOS EN BLANCO`)) / votos) * 100, digits = 1)
+         )
+#reordenar y renombrar headers:
 vxr_bn <- vxr_bn[, c(1,2,5,3,6,4,7)] %>% 
   `colnames<-`(c("Region", 
                  "Votos en blanco",
@@ -119,6 +129,6 @@ vxr_bn <- vxr_bn[, c(1,2,5,3,6,4,7)] %>%
                  "Porcentaje de votos nulos",
                  "Votos válidamente emitidos",
                  "Porcentaje de votos válidamente emitidos"))
-#reordenar y renombrar headers
+###
 ```
 
